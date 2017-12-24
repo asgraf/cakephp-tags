@@ -21,28 +21,15 @@ class TagsAppTable extends Table
 {
 
 /**
- * Behaviors
- *
- * @var array
- */
-    public $actsAs = array(
-        'Containable'
-    );
-
-/**
  * Customized paginateCount method
  *
  * @param array $conditions Query conditions.
- * @param int $recursive Recursive setting.
  * @param array $extra Extra configuration.
  * @return array
  */
-    public function paginateCount($conditions = array(), $recursive = 0, $extra = array())
+    public function paginateCount($conditions = array(), $extra = array())
     {
         $parameters = compact('conditions');
-        if ($recursive != $this->recursive) {
-            $parameters['recursive'] = $recursive;
-        }
         if (isset($extra['type']) && isset($this->findMethods[$extra['type']])) {
             $extra['operation'] = 'count';
             return $this->find($extra['type'], array_merge($parameters, $extra));

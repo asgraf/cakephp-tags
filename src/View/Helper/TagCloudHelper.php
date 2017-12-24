@@ -11,7 +11,9 @@
 
 namespace Tags\View\Helper;
 
+use Cake\Utility\Hash;
 use \Cake\View\Helper;
+use Tags\Model\Table\TaggedTable;
 
 /**
  * Tag cloud helper
@@ -25,7 +27,7 @@ class TagCloudHelper extends Helper
 /**
  * Other helpers to load
  *
- * @var public $helpers
+ * @var array
  */
     public $helpers = array(
         'Html'
@@ -49,15 +51,15 @@ class TagCloudHelper extends Helper
  *  - named: the named parameter used to send the tag [default: by].
  * @return string
  */
-    public function display($tags = null, $options = array())
+    public function display(array $tags, $options = array())
     {
-        if (empty($tags) || !is_array($tags)) {
+        if (empty($tags)) {
             return '';
         }
         $defaults = array(
-            'tagModel' => 'Tag',
+            'tagModel' => 'tags',
             'shuffle' => true,
-            'extract' => '{n}.Tag.weight',
+            'extract' => '{n}.weight',
             'before' => '',
             'after' => '',
             'maxSize' => 160,
@@ -69,7 +71,9 @@ class TagCloudHelper extends Helper
         );
         $options = array_merge($defaults, $options);
 
-        $weights = Set::extract($tags, $options['extract']);
+        $tags = TaggedTable::calculateWeights($tags);
+
+        $weights = Hash::extract($tags, $options['extract']);
         $maxWeight = max($weights);
         $minWeight = min($weights);
 
@@ -85,15 +89,14 @@ class TagCloudHelper extends Helper
 
         $cloud = null;
         foreach ($tags as $tag) {
-            $data = Set::extract(array($tag), $options['extract']);
-            $tagWeight = array_pop($data);
+            $tagWeight = $tag['weight'];
 
             $size = $options['minSize'] + (
                 ($tagWeight - $minWeight) * (
                     ($options['maxSize'] - $options['minSize']) / $spread
                 )
             );
-            $size = $tag[$options['tagModel']]['size'] = ceil($size);
+            $size = $tag['size'] = ceil($size);
 
             $cloud .= $this->_replace($options['before'], $size);
             $cloud .= $this->Html->link(

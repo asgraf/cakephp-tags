@@ -10,6 +10,8 @@
  */
 namespace Tags\Model\Table;
 
+use Cake\Database\Expression\QueryExpression;
+use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Tags\Model\Table\TagsAppTable;
 
@@ -30,16 +32,6 @@ class TaggedTable extends TagsAppTable
     public $useTable = 'tagged';
 
 /**
- * Find methodes
- *
- * @var array
- */
-    public $findMethods = array(
-        'cloud' => true,
-        'tagged' => true
-    );
-
-/**
  * initialize
  *
  * @param array $config Configuration array.
@@ -47,9 +39,9 @@ class TaggedTable extends TagsAppTable
  */
     public function initialize(array $config)
     {
-        $this->belongsTo('Tag', [
-            'propertyName' => 'tag',
-            'className' => 'Tags.Tag'
+        $this->belongsTo('Tags', [
+            'propertyName' => 'tags',
+            'className' => 'Tags.Tags'
         ]);
     }
 
@@ -64,54 +56,56 @@ class TaggedTable extends TagsAppTable
  * @todo Ideas to improve this are welcome
  * @param string $state Find state (before or after).
  * @param array $query Query array.
- * @param array $results Results array.
  * @return array
  * @link https://github.com/CakeDC/tags/issues/10
  */
-    public function _findCloud($state, $query, $results = array())
+    public function findCloud($query)
     {
-        if ($state === 'before') {
-            // Support old code without the occurrence cache
-            if (!$this->Tag->hasField('occurrence') || Hash::get($query, 'occurrenceCache') === false) {
-                $groupBy = array('Tagged.tag_id', 'Tag.id', 'Tag.identifier', 'Tag.name', 'Tag.keyname', 'Tag.weight');
-                $fields = implode(', ', $groupBy + array('COUNT(*) AS occurrence'));
-            } else {
-                // This is related to https://github.com/CakeDC/tags/issues/10 to work around a limitation of postgres
-                $field = $this->getDataSource()->fields($this->Tag);
-                $field = array_merge($field, $this->getDataSource()->fields($this, null, "Tagged.tag_id"));
-                $fields = "DISTINCT " . join(',', $field);
-                $groupBy = null;
-            }
-            $options = array(
-                'minSize' => 10,
-                'maxSize' => 20,
-                'page' => '',
-                'limit' => '',
-                'order' => '',
-                'joins' => array(),
-                'offset' => '',
-                'contain' => 'Tag',
-                'conditions' => array(),
-                'fields' => $fields,
-                'group' => $groupBy
-            );
+		// Support old code without the occurrence cache
+		if (!$this->Tags->hasField('occurrence') || Hash::get($query, 'occurrenceCache') === false) {
+			$groupBy = array('Tagged.tag_id', 'Tags.id', 'Tags.identifier', 'Tags.name', 'Tags.keyname', 'Tags.weight');
+			$fields = $groupBy;
+			$fields['occurrence'] = $query->func()->count('*');
+		} else {
+			// This is related to https://github.com/CakeDC/tags/issues/10 to work around a limitation of postgres
+			$field = $this->getDataSource()->fields($this->Tag);
+			$field = array_merge($field, $this->getDataSource()->fields($this, null, "Tagged.tag_id"));
+			$fields = "DISTINCT " . join(',', $field);
+			$groupBy = null;
+		}
+		$options = array(
+			'minSize' => 10,
+			'maxSize' => 20,
+			//'page' => '',
+			//'limit' => '',
+			//'order' => '',
+			//'joins' => array(),
+			//'offset' => '',
+			'contain' => 'Tags',
+			//'conditions' => array(),
+			'fields' => $fields,
+			'group' => $groupBy
+		);
 
-            foreach ($query as $key => $value) {
-                if (!empty($value)) {
-                    $options[$key] = $value;
-                }
-            }
-            $query = $options;
+		//$query['conditions'] = Hash::merge($query['conditions'], array('Tagged.model' => $query['model']));
 
-            if (isset($query['model'])) {
-                $query['conditions'] = Set::merge($query['conditions'], array('Tagged.model' => $query['model']));
-            }
+		if (false) {
+			//FIXME
+		$query->formatResults(function (\Cake\Collection\CollectionInterface $results) {
+			return $results->map(function ($row) {
+				/** @var \Tags\Model\Entity\Tagged $row */
+				$row['weight'] = '';
+				return $row;
+			});
+		});
+		}
 
-            return $query;
-        } elseif ($state == 'after') {
+		return $query->find('all', $options);
+
+        if ($state == 'after') {
             if (!empty($results) && isset($results[0][0]['occurrence']) || isset($results[0]['Tag']['occurrence'])) {
                 // Support old code without the occurrence cache
-                if (!$this->Tag->hasField('occurrence')) {
+                if (!$this->Tags->hasField('occurrence')) {
                     foreach ($results as $key => $result) {
                         $results[$key]['Tag']['occurrence'] = $results[$key][0]['occurrence'];
                     }
@@ -121,27 +115,39 @@ class TaggedTable extends TagsAppTable
                     }
                 }
 
-                $weights = Set::extract($results, '{n}.Tag.occurrence');
-                $maxWeight = max($weights);
-                $minWeight = min($weights);
-
-                $spread = $maxWeight - $minWeight;
-                if (0 == $spread) {
-                    $spread = 1;
-                }
-
-                foreach ($results as $key => $result) {
-                    $size = $query['minSize'] + (
-                        ($result['Tag']['occurrence'] - $minWeight) * (
-                            ($query['maxSize'] - $query['minSize']) / ($spread)
-                        )
-                    );
-                    $results[$key]['Tag']['weight'] = ceil($size);
-                }
+                //static::calculateWeights();
             }
             return $results;
         }
     }
+
+
+	public static function calculateWeights(array $entities, array $config = []) {
+    	$config += [
+			'minSize' => 10,
+			'maxSize' => 20,
+		];
+
+		$weights = Hash::extract($entities, '{n}.occurrence');
+		$maxWeight = max($weights);
+		$minWeight = min($weights);
+
+		$spread = $maxWeight - $minWeight;
+		if (0 == $spread) {
+			$spread = 1;
+		}
+
+		foreach ($entities as $key => $result) {
+			$size = $config['minSize'] + (
+					($result['occurrence'] - $minWeight) * (
+						($config['maxSize'] - $config['minSize']) / ($spread)
+					)
+				);
+			$entities[$key]['weight'] = ceil($size);
+		}
+
+		return $entities;
+	}
 
 /**
  * Find all the Model entries tagged with a given tag
@@ -159,51 +165,36 @@ class TaggedTable extends TagsAppTable
  * @param array $results Results array.
  * @return mixed Query array if state is before, array of results or integer (count) if state is after
  */
-    public function _findTagged($state, $query, $results = array())
+    public function findTagged($query, $results = array())
     {
-        if ($state === 'before') {
-            if (isset($query['model']) && $Model = ClassRegistry::init($query['model'])) {
-                $this->bindModel(array(
-                    'belongsTo' => array(
-                        $Model->alias => array(
-                            'className' => $Model->name,
-                            'foreignKey' => 'foreign_key',
-                            'type' => 'INNER',
-                            'conditions' => array(
-                                $this->alias . '.model' => $Model->alias)))), false);
+		if (isset($query['model']) && $Model = TableRegistry::get($query['model'])) {
+			$this->addAssociations(array(
+				'belongsTo' => array(
+					$Model->alias() => array(
+						'className' => $Model->name,
+						'foreignKey' => 'foreign_key',
+						'type' => 'INNER',
+						'conditions' => array(
+							$this->alias() . '.model' => $Model->alias())))));
 
-                if (!isset($query['recursive'])) {
-                    $query['recursive'] = 0;
-                }
+			if (isset($query['operation']) && $query['operation'] == 'count') {
+				$query['fields'] = "COUNT(DISTINCT $Model->alias.$Model->primaryKey)";
+				$this->Behaviors->Containable->setup($this, array('autoFields' => false));
+			} else {
+				if ($query['fields'] === null) {
+					$query['fields'][] = "DISTINCT " . join(',', $this->getDataSource()->fields($Model));
+				} else {
+					$distinctFields = join(',', $this->getDataSource()->fields($Model));
+					array_unshift($query['fields'], "DISTINCT " . $distinctFields);
+				}
+			}
 
-                if ($query['recursive'] == -1) {
-                    $message = 'Find tagged will not work with a recursive level of -1, you need at least 0.';
-                    throw new InvalidArgumentException(__d('tags', $message, true), E_USER_ERROR);
-                }
+			if (!empty($query['by'])) {
+				$query['conditions'][] = array(
+					$this->Tags->alias . '.keyname' => $query['by']);
+			}
+		}
 
-                if (isset($query['operation']) && $query['operation'] == 'count') {
-                    $query['fields'] = "COUNT(DISTINCT $Model->alias.$Model->primaryKey)";
-                    $this->Behaviors->Containable->setup($this, array('autoFields' => false));
-                } else {
-                    if ($query['fields'] === null) {
-                        $query['fields'][] = "DISTINCT " . join(',', $this->getDataSource()->fields($Model));
-                    } else {
-                        $distinctFields = join(',', $this->getDataSource()->fields($Model));
-                        array_unshift($query['fields'], "DISTINCT " . $distinctFields);
-                    }
-                }
-
-                if (!empty($query['by'])) {
-                    $query['conditions'][] = array(
-                        $this->Tag->alias . '.keyname' => $query['by']);
-                }
-            }
-            return $query;
-        } elseif ($state == 'after') {
-            if (isset($query['operation']) && $query['operation'] == 'count') {
-                return array_shift($results[0][0]);
-            }
-            return $results;
-        }
+		return $query;
     }
 }
