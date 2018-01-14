@@ -17,12 +17,8 @@
 
 /**
  * Short description for class.
- *
- * @package         plugins.tags
- * @subpackage  plugins.tags.config.migrations
  */
-class M4c0d42bcd12c4db099c105f40e8f3d6d extends CakeMigration
-{
+class M4c0d42bcd12c4db099c105f40e8f3d6d extends CakeMigration {
 
 /**
  * Migration description
@@ -30,50 +26,49 @@ class M4c0d42bcd12c4db099c105f40e8f3d6d extends CakeMigration
  * @var string
  * @access public
  */
-    public $description = 'Adds the column times_tagged to track the number of times a record has been tagged';
+	public $description = 'Adds the column times_tagged to track the number of times a record has been tagged';
 
 /**
  * Actions to be performed
  *
- * @var array $migration
+ * @var array
  * @access public
  */
-    public $migration = array(
-        'up' => array(
-            'create_field' => array(
-                'tagged' => array(
-                    'times_tagged' => array('type' => 'integer', 'null' => false, 'default' => 1),
-                    )
-                ),
-        ),
-        'down' => array(
-            'drop_field' => array(
-                'tagged' => array('times_tagged')
-            ),
-        ),
-    );
+	public $migration = [
+		'up' => [
+			'create_field' => [
+				'tagged' => [
+					'times_tagged' => ['type' => 'integer', 'null' => false, 'default' => 1],
+					]
+				],
+		],
+		'down' => [
+			'drop_field' => [
+				'tagged' => ['times_tagged']
+			],
+		],
+	];
 
 /**
  * Before migration callback
  *
  * @param string $direction, up or down direction of migration process
- * @return boolean Should process continue
+ * @return bool Should process continue
  * @access public
  */
-    public function before($direction)
-    {
-        return true;
-    }
+	public function before($direction) {
+		return true;
+	}
 
 /**
  * After migration callback
  *
  * @param string $direction, up or down direction of migration process
- * @return boolean Should process continue
+ * @return bool Should process continue
  * @access public
  */
-    public function after($direction)
-    {
-        return true;
-    }
+	public function after($direction) {
+		return true;
+	}
+
 }

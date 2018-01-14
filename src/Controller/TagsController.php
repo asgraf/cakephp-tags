@@ -11,151 +11,63 @@
 
 namespace Tags\Controller;
 
+use App\Controller\AppController;
+
 /**
  * Tags Controller
- *
- * @package tags
- * @subpackage tags.controllers
  */
-class TagsController extends TagsAppController
-{
+class TagsController extends AppController {
 
-/**
- * Uses
- *
- * @var array
- */
-    public $uses = array(
-        'Tags.Tag'
-    );
+				/**
+				 * Uses
+				 *
+				 * @var array
+				 */
+	public $uses = [
+		'Tags.Tag'
+	];
 
-/**
- * Components
- *
- * @var array
- */
-    public $components = array(
-        'Session',
-        'Paginator'
-    );
+				/**
+				 * Components
+				 *
+				 * @var array
+				 */
+	public $components = [
+		'Paginator'
+	];
 
-/**
- * Helpers
- *
- * @var array
- */
-    public $helpers = array(
-        'Html', 'Form'
-    );
+				/**
+				 * Helpers
+				 *
+				 * @var array
+				 */
+	public $helpers = [
+		'Html', 'Form'
+	];
 
-/**
- * Index action
- *
- * @return void
- */
-    public function index()
-    {
-        $this->{$this->modelClass}->recursive = 0;
-        $this->set('tags', $this->Paginator->paginate());
-    }
+				/**
+				 * Index action
+				 *
+				 * @return void
+				 */
+	public function index() {
+		//$this->{$this->modelClass}->recursive = 0;
+		$this->set('tags', $this->paginate());
+	}
 
-/**
- * View
- *
- * @param string $id Tag UUID.
- * @return void
- */
-    public function view($id = null)
-    {
-        try {
-            $this->set('tag', $this->{$this->modelClass}->view($id));
-        } catch (Exception $e) {
-            $this->Session->setFlash($e->getMessage());
-            $this->redirect('/');
-        }
-    }
+				/**
+				 * View
+				 *
+				 * @param string|null $id Tag UUID.
+				 * @return void
+				 */
+	public function view($id = null) {
+		try {
+			$this->set('tag', $this->{$this->modelClass}->view($id));
+		} catch (Exception $e) {
+			$this->Session->setFlash($e->getMessage());
+			$this->redirect('/');
+		}
+	}
 
-/**
- * Admin Index
- *
- * @return void
- */
-    public function admin_index()
-    {
-         $this->{$this->modelClass}->recursive = 0;
-        $this->set('tags', $this->Paginator->paginate());
-    }
-
-/**
- * Views a single tag
- *
- * @param string $id Tag UUID.
- * @return void
- */
-    public function admin_view($id)
-    {
-        try {
-            $this->set('tag', $this->{$this->modelClass}->view($id));
-        } catch (Exception $e) {
-            $this->Session->setFlash($e->getMessage());
-            $this->redirect('/');
-        }
-    }
-
-/**
- * Adds one or more tags
- *
- * @return void
- */
-    public function admin_add()
-    {
-        if (!empty($this->request->data)) {
-            if ($this->{$this->modelClass}->add($this->request->data)) {
-                $this->Session->setFlash(__d('tags', 'The Tags has been saved.'));
-                $this->redirect(array('action' => 'index'));
-            }
-        }
-    }
-
-/**
- * Edits a tag
- *
- * @param string $id Tag UUID.
- * @return void
- */
-    public function admin_edit($id = null)
-    {
-        try {
-            $result = $this->{$this->modelClass}->edit($id, $this->request->data);
-            if ($result === true) {
-                $this->Session->setFlash(__d('tags', 'Tag saved.'));
-                $this->redirect(array('action' => 'index'));
-            } else {
-                $this->request->data = $result;
-            }
-        } catch (Exception $e) {
-            $this->Session->setFlash($e->getMessage());
-            $this->redirect(array('action' => 'index'));
-        }
-
-        if (empty($this->request->data)) {
-            $this->request->data = $this->{$this->modelClass}->data;
-        }
-    }
-
-/**
- * Deletes a tag
- *
- * @param string $id Tag UUID.
- * @return void
- */
-    public function admin_delete($id = null)
-    {
-        if ($this->{$this->modelClass}->delete($id)) {
-            $this->Session->setFlash(__d('tags', 'Tag deleted.'));
-        } else {
-            $this->Session->setFlash(__d('tags', 'Invalid Tag.'));
-        }
-        $this->redirect(array('action' => 'index'));
-    }
 }

@@ -2,10 +2,15 @@
 	"name": "dereuromark/cakephp-tags",
 	"type": "cakephp-plugin",
 	"description": "Tags plugin for CakePHP.",
-	"homepage": "http://github.com/CakeDC/tags",
+	"homepage": "http://github.com/dereuromark/cakephp-tags",
 	"keywords": ["cakephp", "tags", "plugin"],
 	"license": "MIT",
 	"authors": [
+		{
+			"name": "Mark Scherer",
+			"homepage": "http://www.dereuromark.de",
+			"role": "Maintainer"
+		},
 		{
 			"name": "Cake Development Corporation",
 			"email": "team@cakedc.com",
@@ -16,6 +21,9 @@
 		"php": ">=5.4",
 		"cakephp/cakephp": "^3.1"
 	},
+	"require-dev": {
+		"fig-r/psr2r-sniffer": "dev-master"
+	},
 	"autoload": {
 		"psr-4": {
 			"Tags\\": "src/",
@@ -25,7 +33,15 @@
 	"autoload-dev": {
 		"psr-4": {
 			"Tags\\Test\\": "tests/",
+			"App\\": "tests/test_app/src/",
 			"Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
 		}
+	},
+	"scripts": {
+		"test": "php phpunit.phar",
+		"test-setup": "[ ! -f phpunit.phar ] && wget https://phar.phpunit.de/phpunit-5.7.20.phar && mv phpunit-5.7.20.phar phpunit.phar || true",
+		"test-coverage" : "php phpunit.phar --log-junit tmp/coverage/unitreport.xml --coverage-html tmp/coverage --coverage-clover tmp/coverage/coverage.xml",
+		"cs-check": "phpcs -p --standard=vendor/fig-r/psr2r-sniffer/PSR2R/ruleset.xml --ignore=/cakephp-tags/vendor/,/tmp/,/logs/ --extensions=php ./",
+		"cs-fix": "phpcbf -v --standard=vendor/fig-r/psr2r-sniffer/PSR2R/ruleset.xml --ignore=/cakephp-tags/vendor/,/tmp/,/logs/ --extensions=php ./"
 	}
 }

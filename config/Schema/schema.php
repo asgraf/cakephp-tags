@@ -9,30 +9,27 @@
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-class TagSchema extends CakeSchema
-{
+class TagSchema extends CakeSchema {
 
 /**
  * Before callback
  *
  * @param array Event
- * @return boolean
+ * @return bool
  */
-    public function before($event = array())
-    {
-        return true;
-    }
+	public function before($event = []) {
+		return true;
+	}
 
 /**
  * After callback
  *
  * @param array Event
- * @return boolean
+ * @return bool
  */
-    public function after($event = array())
-    {
-        return true;
-    }
+	public function after($event = []) {
+		return true;
+	}
 
 /**
  * Schema for taggeds table
@@ -40,22 +37,22 @@ class TagSchema extends CakeSchema
  * @var array
  * @access public
  */
-    public $tagged = array(
-        'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
-        'foreign_key' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36),
-        'tag_id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36),
-        'model' => array('type' => 'string', 'null' => false, 'default' => null, 'key' => 'index'),
-        'language' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 6, 'key' => 'index'),
-        'times_tagged' => array('type' => 'integer', 'null' => false, 'default' => '1'),
-        'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'indexes' => array(
-            'PRIMARY' => array('column' => 'id', 'unique' => 1),
-            'UNIQUE_TAGGING' => array('column' => array('model', 'foreign_key', 'tag_id', 'language'), 'unique' => 1),
-            'INDEX_TAGGED' => array('column' => 'model', 'unique' => 0),
-            'INDEX_LANGUAGE' => array('column' => 'language', 'unique' => 0)
-        )
-    );
+	public $tagged = [
+		'id' => ['type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'key' => 'primary'],
+		'foreign_key' => ['type' => 'integer', 'null' => false, 'default' => null, 'length' => 10],
+		'tag_id' => ['type' => 'integer', 'null' => false, 'default' => null, 'length' => 10],
+		'model' => ['type' => 'string', 'null' => false, 'default' => null, 'key' => 'index'],
+		'language' => ['type' => 'string', 'null' => true, 'default' => null, 'length' => 6, 'key' => 'index'],
+		'times_tagged' => ['type' => 'integer', 'null' => false, 'default' => '1'],
+		'created' => ['type' => 'datetime', 'null' => true, 'default' => null],
+		'modified' => ['type' => 'datetime', 'null' => true, 'default' => null],
+		'indexes' => [
+			'PRIMARY' => ['column' => 'id', 'unique' => 1],
+			'UNIQUE_TAGGING' => ['column' => ['model', 'foreign_key', 'tag_id', 'language'], 'unique' => 1],
+			'INDEX_TAGGED' => ['column' => 'model', 'unique' => 0],
+			'INDEX_LANGUAGE' => ['column' => 'language', 'unique' => 0]
+		]
+	];
 
 /**
  * Schema for tags table
@@ -63,16 +60,17 @@ class TagSchema extends CakeSchema
  * @var array
  * @access public
  */
-    public $tags = array(
-        'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
-        'identifier' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 30, 'key' => 'index'),
-        'name' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 30),
-        'keyname' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 30),
-        'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'indexes' => array(
-            'PRIMARY' => array('column' => 'id', 'unique' => 1),
-            'UNIQUE_TAG' => array('column' => array('identifier', 'keyname'), 'unique' => 1)
-        )
-    );
+	public $tags = [
+		'id' => ['type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'key' => 'primary'],
+		'identifier' => ['type' => 'string', 'null' => true, 'default' => null, 'length' => 30, 'key' => 'index'],
+		'name' => ['type' => 'string', 'null' => false, 'default' => null, 'length' => 30],
+		'keyname' => ['type' => 'string', 'null' => false, 'default' => null, 'length' => 30],
+		'created' => ['type' => 'datetime', 'null' => true, 'default' => null],
+		'modified' => ['type' => 'datetime', 'null' => true, 'default' => null],
+		'indexes' => [
+			'PRIMARY' => ['column' => 'id', 'unique' => 1],
+			'UNIQUE_TAG' => ['column' => ['identifier', 'keyname'], 'unique' => 1]
+		]
+	];
+
 }

@@ -17,12 +17,8 @@
 
 /**
  * Short description for class.
- *
- * @package         plugins.tags
- * @subpackage  plugins.tags.config.migrations
  */
-class M8d01880f01c11e0be500800200c9a66 extends CakeMigration
-{
+class M8d01880f01c11e0be500800200c9a66 extends CakeMigration {
 
 /**
  * Migration description
@@ -30,58 +26,57 @@ class M8d01880f01c11e0be500800200c9a66 extends CakeMigration
  * @var string
  * @access public
  */
-    public $description = 'Adds the column times_tagged to track the number of times a record has been tagged';
+	public $description = 'Adds the column times_tagged to track the number of times a record has been tagged';
 
 /**
  * Actions to be performed
  *
- * @var array $migration
+ * @var array
  * @access public
  */
-    public $migration = array(
-        'up' => array(
-            'create_field' => array(
-                'tags' => array(
-                    'occurrence' => array('type' => 'integer', 'null' => false, 'default' => 0, 'length' => 8),
-                    )
-                ),
-            'drop_field' => array(
-                'tags' => array('weight')
-            ),
-        ),
-        'down' => array(
-            'drop_field' => array(
-                'tags' => array('occurrence')
-            ),
-            'create_field' => array(
-                'tags' => array(
-                    'weight' => array('type' => 'integer', 'null' => false, 'default' => 0, 'length' => 2),
-                ),
-            ),
-        ),
-    );
+	public $migration = [
+		'up' => [
+			'create_field' => [
+				'tags' => [
+					'occurrence' => ['type' => 'integer', 'null' => false, 'default' => 0, 'length' => 8],
+					]
+				],
+			'drop_field' => [
+				'tags' => ['weight']
+			],
+		],
+		'down' => [
+			'drop_field' => [
+				'tags' => ['occurrence']
+			],
+			'create_field' => [
+				'tags' => [
+					'weight' => ['type' => 'integer', 'null' => false, 'default' => 0, 'length' => 2],
+				],
+			],
+		],
+	];
 
 /**
  * Before migration callback
  *
  * @param string $direction, up or down direction of migration process
- * @return boolean Should process continue
+ * @return bool Should process continue
  * @access public
  */
-    public function before($direction)
-    {
-        return true;
-    }
+	public function before($direction) {
+		return true;
+	}
 
 /**
  * After migration callback
  *
  * @param string $direction, up or down direction of migration process
- * @return boolean Should process continue
+ * @return bool Should process continue
  * @access public
  */
-    public function after($direction)
-    {
-        return true;
-    }
+	public function after($direction) {
+		return true;
+	}
+
 }

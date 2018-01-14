@@ -22,8 +22,7 @@
  * @subpackage  plugins.tags.config.migrations
  */
 
-class M49ac311a54844a9d87o822502jedc423 extends CakeMigration
-{
+class M49ac311a54844a9d87o822502jedc423 extends CakeMigration {
 
 /**
  * Migration description
@@ -31,73 +30,72 @@ class M49ac311a54844a9d87o822502jedc423 extends CakeMigration
  * @var string
  * @access public
  */
-    public $description = 'Initialize Tags Schema';
+	public $description = 'Initialize Tags Schema';
 
 /**
  * Actions to be performed
  *
- * @var array $migration
+ * @var array
  * @access public
  */
-    public $migration = array(
-        'up' => array(
-            'create_table' => array(
-                'tagged' => array(
-                    'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
-                    'foreign_key' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36),
-                    'tag_id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36),
-                    'model' => array('type' => 'string', 'null' => false, 'default' => null, 'key' => 'index'),
-                    'language' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 6),
-                    'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
-                    'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-                    'indexes' => array(
-                        'PRIMARY' => array('column' => 'id', 'unique' => 1),
-                        'UNIQUE_TAGGING' => array('column' => array('model', 'foreign_key', 'tag_id', 'language'), 'unique' => 1),
-                        'INDEX_TAGGED' => array('column' => 'model', 'unique' => 0),
-                        'INDEX_LANGUAGE' => array('column' => 'language', 'unique' => 0)
-                    )
-                ),
-                'tags' => array(
-                    'id' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary'),
-                    'identifier' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 30, 'key' => 'index'),
-                    'name' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 30),
-                    'keyname' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 30),
-                    'weight' => array('type' => 'integer', 'null' => false, 'default' => 0, 'length' => 2),
-                    'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
-                    'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-                    'indexes' => array(
-                        'PRIMARY' => array('column' => 'id', 'unique' => 1),
-                        'UNIQUE_TAG' => array('column' => array('identifier', 'keyname'), 'unique' => 1)
-                    )
-                )
-            )
-        ),
-        'down' => array(
-            'drop_table' => array('tagged', 'tags')
-        )
-    );
+	public $migration = [
+		'up' => [
+			'create_table' => [
+				'tagged' => [
+					'id' => ['type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'key' => 'primary'],
+					'foreign_key' => ['type' => 'integer', 'null' => false, 'default' => null, 'length' => 10],
+					'tag_id' => ['type' => 'integer', 'null' => false, 'default' => null, 'length' => 10],
+					'model' => ['type' => 'string', 'null' => false, 'default' => null, 'key' => 'index'],
+					'language' => ['type' => 'string', 'null' => true, 'default' => null, 'length' => 6],
+					'created' => ['type' => 'datetime', 'null' => true, 'default' => null],
+					'modified' => ['type' => 'datetime', 'null' => true, 'default' => null],
+					'indexes' => [
+						'PRIMARY' => ['column' => 'id', 'unique' => 1],
+						'UNIQUE_TAGGING' => ['column' => ['model', 'foreign_key', 'tag_id', 'language'], 'unique' => 1],
+						'INDEX_TAGGED' => ['column' => 'model', 'unique' => 0],
+						'INDEX_LANGUAGE' => ['column' => 'language', 'unique' => 0]
+					]
+				],
+				'tags' => [
+					'id' => ['type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'key' => 'primary'],
+					'identifier' => ['type' => 'string', 'null' => true, 'default' => null, 'length' => 30, 'key' => 'index'],
+					'name' => ['type' => 'string', 'null' => false, 'default' => null, 'length' => 30],
+					'keyname' => ['type' => 'string', 'null' => false, 'default' => null, 'length' => 30],
+					'weight' => ['type' => 'integer', 'null' => false, 'default' => 0, 'length' => 2],
+					'created' => ['type' => 'datetime', 'null' => true, 'default' => null],
+					'modified' => ['type' => 'datetime', 'null' => true, 'default' => null],
+					'indexes' => [
+						'PRIMARY' => ['column' => 'id', 'unique' => 1],
+						'UNIQUE_TAG' => ['column' => ['identifier', 'keyname'], 'unique' => 1]
+					]
+				]
+			]
+		],
+		'down' => [
+			'drop_table' => ['tagged', 'tags']
+		]
+	];
 
 /**
  * Before migration callback
  *
  * @param string $direction, up or down direction of migration process
- * @return boolean Should process continue
+ * @return bool Should process continue
  * @access public
  */
-    public function before($direction)
-    {
-        return true;
-    }
+	public function before($direction) {
+		return true;
+	}
 
 /**
  * After migration callback
  *
  * @param string $direction, up or down direction of migration process
- * @return boolean Should process continue
+ * @return bool Should process continue
  * @access public
  */
-    public function after($direction)
-    {
-        return true;
-    }
+	public function after($direction) {
+		return true;
+	}
+
 }
